@@ -1,3 +1,7 @@
+'''Date - July 2020 '''
+'''Author - Sudhir kumar'''
+
+
 from django.shortcuts import render, redirect, HttpResponse
 from .forms import ScrapForm
 import time, os, json, re
