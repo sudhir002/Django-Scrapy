@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        #form-box {
+            width:300px;
+            padding:30px 5%;
+            margin:30px auto;
+            border-radius:5px;
+         border: 1px solid #ddd;
+        box-shadow: 2px 0 7px #eee;
+        text-align: center;
+        background: #f5f5f5;
+        }
+        #form-box label {
+            text-align:left;
+                font-family: monospace;
+    font-size: 20px;
+        }
+        #form-box input {
+            padding:3px 10px;
+            width:280px;
+        }
+        #form-box button {
+            background:#007ae2;
+            color:#fff;
+            padding:5px 10px;
+            width:100%;
+            text-align:center;
+            font-family: monospace;
+            font-size: 20px;
+            outline:none;
+            border:0;
+        }
+        #myProgress {
+            display:none;
+            width: 80%;
+            position:relative;
+            margin:0 auto 20px;
+            background-color: #ddd;
+}
+#dataList {
+    word-break: break-all;
+    width:80%;
+    padding:0 15px 10px;
+    font-family: tahoma;
+    margin:auto;
+    font-size:15px;
+    border: 1px solid #ddd;
+}
+#error-box {
+    padding: 30px;
+    text-align: center;
+    width: 60%;
+    margin: auto;
+    font-size: 26px;
+    border: 1px solid #ddd;
+    background: #f5f5f5;
+    border-radius: 5px;
+    font-family: tahoma;
+    color: #b70000;
+}
+#myBar {
+  width: 1%;
+  height: 30px;
+  background-color: #4CAF50;
+}
+        #perc { position:absolute;left:0;right:0;margin:auto;z-index:1;top:3px;text-align:center;color:#333;}
+    </style>
+</head>
+<body>
+
+<div id="form-box">
+<form method="POST" class="post-form"  id="txt">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="button" class="save btn btn-default" id="btn" >Sumbit</button>
+</form>
+</div>
+<div id="myProgress">
+  <div id="myBar"></div>
+    <span id="perc"></span>
+</div>
+<div id="dataList">
+</div>
+<input type="hidden" value="" />
+<br><br><br>
+
+<script>
+        var x;
+        var j = 0;
+        var k = 0;
+
+        $(document).ready(function () {
+            $("#btn").click(function () {
+                document.getElementById('dataList').innerHTML = '';
+                stop();
+              start();
+                var inVal = $('#id_UrlsName').val();
+                $.ajax({
+                    type: 'post',
+                    url: '/dataScraping',
+                    data: {UrlsName: inVal},
+                    success: function (data) {
+                          clearInterval(timer);
+                        document.getElementById('perc').innerHTML = "100%";
+                        document.getElementById("myBar").style.width = "100%";
+                        var Jdata = JSON.parse(data);
+                        if(Jdata.Status == "UrlErr"){
+                            $('body').html("<div id='error-box'>Sorry ! You have entered wrong Url</div>");
+                        }
+                        if(Jdata.Status == "RequestErr"){
+                             $('body').html("<div id='error-box'>Sorry ! Only Post Request Accepted</div>")
+                        }
+
+                        Jdata.map(obj => {
+                            console.log(obj);
+                            var key = Object.keys(obj)[0];
+                            {#console.log(Object.keys(obj)[0]);#}
+                            var inneritem = obj[key];
+                            {#console.log(x[1]);#}
+                            var y = inneritem.length;
+                            $("#dataList").append("<h3>" + Object.keys(obj) + "</h3>");
+                            {#document.getElementById('dataList').innerHTML = Object.keys(obj) + "<br />";#}
+                            k++;
+                            for (var i = 0; i < y; i++) {
+                                j++;
+                                if (j > 100) {
+                                    break;
+                                }
+                                else {
+                                    $("#dataList").append(j + ". " + inneritem[i] + "<br>");
+                                }
+                            }
+                            j = 0;
+                        })
+                    }
+                })
+
+            });
+
+        });
+
+var timer = null,
+  interval = 200,
+  value = 0;
+function start(){
+    $("#myProgress").show();
+  value = 0;
+  $("#myBar").css('width',"0%");
+  $("#perc").html("");
+  if (timer !== null) return;
+  timer = setInterval(function () {
+      value = value+1;
+      $("#myBar").css('width',value + "%");
+      $("#perc").html(value + "%");
+      if(value >= 100){
+        clearInterval(timer);
+      }
+  }, interval);
+
+}
+function stop(){
+  clearInterval(timer);
+  timer = null
+}
+
+</script>
+<p> {{ Status }}</p>
+</body>
+</html>

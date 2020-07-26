@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+
+<script>
+
+        let x = {{data|safe}};
+        var j = 0;var k =0;
+        x.map(obj=>{
+            console.log(obj);
+            var key = Object.keys(obj)[0];
+            {#console.log(Object.keys(obj)[0]);#}
+            var inneritem = obj[key];
+            {#console.log(x[1]);#}
+            var y = inneritem.length;
+            document.write(Object.keys(obj) + "<br>");
+
+            k++;
+            for (var i=0; i<y;i++){
+                j++;
+                if(j > 100)
+                {
+                    break;
+                }
+                else {
+                    document.write(j + ". " + inneritem[i] + "<br>")
+                }
+            }
+            j=0;
+             document.write("------------------------------------------------------------------------<br>")
+        })
+</script>
+<pre id="json"></pre>
+
+</body>
+</html>
